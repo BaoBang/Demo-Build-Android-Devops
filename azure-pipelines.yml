@@ -12,8 +12,8 @@ steps:
 
 - task: Gradle@2
   inputs:
-    gradleWrapperFile: '$(System.DefaultWorkingDirectory)/gradlew'
-    workingDirectory: '$(System.DefaultWorkingDirectory)/'
+    workingDirectory: ''
+    gradleWrapperFile: 'gradle'
     options: '-PversionName=$(Build.BuildNumber) -PversionCode=$(Build.BuildId)'
     tasks: 'assembleRelease'
     publishJUnitResults: false
@@ -31,6 +31,6 @@ steps:
 
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: '$(System.DefaultWorkingDirectory)/app/build/outputs/apk/release'
+    PathtoPublish: 'app/build/outputs/apk/release'
     ArtifactName: 'drop'
     publishLocation: 'Container'
