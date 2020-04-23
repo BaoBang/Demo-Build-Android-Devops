@@ -12,8 +12,8 @@ steps:
 
 - task: Gradle@2
   inputs:
-    workingDirectory: ''
-    gradleWrapperFile: 'gradle'
+    workingDirectory: '$(system.defaultWorkingDirectory)/BaseProject'
+    gradleWrapperFile: '$(system.defaultWorkingDirectory)/BaseProject/gradle'
     options: '-PversionName=$(Build.BuildNumber) -PversionCode=$(Build.BuildId)'
     tasks: 'assembleRelease'
     publishJUnitResults: false
