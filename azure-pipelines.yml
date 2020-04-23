@@ -1,47 +1,36 @@
-# Android
-# Build your Android project with Gradle.
-# Add steps that test, sign, and distribute the APK, save build artifacts, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/android
-
 trigger:
-- master
+  - master
 
 pool:
-  vmImage: 'macos-latest'
+  vmImage: 'ubuntu-latest'
+
+name: $(date:yyyy).$(Month)$(rev:.r)
 
 steps:
+
+- script: yarn install
+
 - task: Gradle@2
   inputs:
-    workingDirectory: ''
-    gradleWrapperFile: 'gradlew'
-    gradleOptions: '-Xmx3072m'
+    gradleWrapperFile: 'android/gradlew'
+    workingDirectory: 'android/'
+    options: '-PversionName=$(Build.BuildNumber) -PversionCode=$(Build.BuildId)'
+    tasks: 'assembleRelease'
+    publishJUnitResults: false
     javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.8'
-    jdkArchitectureOption: 'x64'
-    publishJUnitResults: true
-    testResultsFiles: '**/TEST-*.xml'
-    tasks: 'assembleDebug test'
-  displayName: gradlew assembleDebug test
+    gradleOptions: '-Xmx3072m'
 
-- task: AndroidSigning@2
+- task: AndroidSigning@3
   inputs:
     apkFiles: '**/*.apk'
-    jarsign: true
-    jarsignerKeystoreFile: 'demo.jks'
-    jarsignerKeystorePassword: '$(jarsignerKeystorePassword)'
-    jarsignerKeystoreAlias: 'yourKeystoreAlias'
-    jarsignerKeyPassword: '$(jarsignerKeyPassword)'
-    zipalign: true
-
-- task: CopyFiles@2
-  inputs:
-    contents: '**/*.apk'
-    targetFolder: '$(build.artifactStagingDirectory)'
-  displayName: Copy .apk files to artifact staging directory
+    apksignerKeystoreFile: 'demo.jks'
+    apksignerKeystorePassword: '$(KeyStorePassword)'
+    apksignerKeystoreAlias: '$(KeyAlias)'
+    apksignerKeyPassword: '$(KeyPassword)'
+    zipalign: false
 
 - task: PublishBuildArtifacts@1
   inputs:
-    pathToPublish: '$(build.artifactStagingDirectory)'
-    artifactName: 'drop'
-    artifactType: 'container'
-  displayName: Publish artifacts
+    PathtoPublish: 'android/app/build/outputs/apk/release'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
